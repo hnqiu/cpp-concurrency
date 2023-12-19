@@ -10,10 +10,15 @@ void foo(std::string str)
 {
     try
     {
-        std::lock_guard<std::mutex> l(m);
+        // std::lock_guard<std::mutex> l(m);
+        // use unique lock instead so that the mutex can be unlocked
+        // immediately after the critical section
+        std::unique_lock<std::mutex> l(m);
+        // more: https://en.cppreference.com/w/cpp/thread/lock_tag
         std::cout << str[0] << " " << str[1] << " " << str[2] << std::endl;
-        throw std::exception();
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        l.unlock();
+        // throw std::exception();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     catch(const std::exception& e)
     {
